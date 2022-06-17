@@ -1,129 +1,81 @@
 import 'package:flutter/material.dart';
+import '../model/userModel.dart';
+import '../controller/req.dart';
+import '../component/userPage.dart';
 
-class UserPageComponent extends StatelessWidget {
-  String username;
-  String profile;
-  String repo;
-  String followers;
-  String following;
+class UserPage extends StatefulWidget {
+  final String username;
+  const UserPage({Key key, this.username}) : super(key: key);
 
-  UserPageComponent({
-    this.username,
-    this.profile,
-    this.repo,
-    this.followers,
-    this.following,
-  });
-  // const UserPageComponent({Key? key}) : super(key: key);
+  @override
+  _UserPageState createState() => _UserPageState();
+}
+
+class _UserPageState extends State<UserPage> {
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Column(
-          children: [
-            SizedBox(height: 25),
-            Container(
-              width: 150,
-              height: 150,
-              child: CircleAvatar(
-                backgroundImage: NetworkImage(profile),
-                backgroundColor: Colors.transparent,
-              ),
-            ),
-            SizedBox(height: 25,),
-            Text(username, style: 
-              TextStyle(
-                color: Colors.black, fontSize: 30, fontWeight: FontWeight.bold
-              ),
-            ),
-            SizedBox(height: 30,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return RepoPage(username: username);
-                    }));
-                  },
-                  child: Card(
-                    child: Padding(padding: const EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 8),
-                        child: Column(
-                          children: [
-                            Text("Repo", style:
-                              TextStyle(
-                                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(repo, style:
-                            TextStyle(
-                                color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold
-                            )
-                            ),
-                          ],
-                        )
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return FollowersPage(username: username);
-                    }));
-                  },
-                  child: Card(
-                    child: Padding(padding: const EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 8),
-                        child: Column(
-                          children: [
-                            Text("Followers", style:
-                            TextStyle(
-                                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold
-                            ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(followers, style:
-                            TextStyle(
-                                color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold
-                            )
-                            ),
-                          ],
-                        )
-                    ),
-                  ),
-                ),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context){
-                      return FollowingPage(username: username);
-                    }));
-                  },
-                  child: Card(
-                    child: Padding(padding: const EdgeInsets.only(top: 8, left: 10, right: 10, bottom: 8),
-                        child: Column(
-                          children: [
-                            Text("Following", style:
-                            TextStyle(
-                                color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold
-                            ),
-                            ),
-                            SizedBox(height: 10),
-                            Text(following, style:
-                            TextStyle(
-                                color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold
-                            )
-                            ),
-                          ],
-                        )
-                    ),
-                  ),
-                ),
-              ],
-            )
-          ],
-        ),
+      appBar: AppBar(
+        title: Text("GitHub User", style: TextStyle(color: Colors.white)),
+      ),
+      body: _buildDetailUserBody(),
+    );
+  }
+
+  Widget _buildDetailUserBody() {
+    return Container(
+      child: FutureBuilder(
+        future:  UserDataSource.instance.loadUser(widget.username),
+        builder: (BuildContext context,
+            AsyncSnapshot<dynamic> snapshot,) {
+
+          if (snapshot.hasError) {
+            return _buildErrorSection();
+          }
+          if (snapshot.hasData) {
+            UserModel userModel = UserModel.fromJson(snapshot.data);
+            return _buildSuccessSection(userModel);
+          }
+          return _buildLoadingSection();
+        },
       ),
     );
+  }
+
+
+  Widget _buildErrorSection() {
+    return Text("Error");
+  }
+
+  Widget _buildLoadingSection() {
+    return Center(
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _buildSuccessSection(UserModel data) {
+    return _userPage(
+        '${data.login}',
+        '${data.avatarUrl}',
+        '${data.publicRepos}',
+        '${data.followers}',
+        '${data.following}'
+    );
+  }
+
+  Widget _userPage(String tempUserName, String tempProfile, String tempRepo, String tempFollower, String tempFollowing){
+    if(tempUserName == "null"){
+      return Center(child: Text('User Not Found'),);
+    }
+    else {
+      return UserPageComponent(
+          username: tempUserName,
+          profile: tempProfile,
+          repo: tempRepo,
+          followers: tempFollower,
+          following: tempFollowing
+      );
+    }
   }
 }

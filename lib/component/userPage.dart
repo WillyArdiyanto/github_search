@@ -19,7 +19,6 @@ class UserPageComponent extends StatelessWidget {
     this.followers,
     this.following,
   });
-  // const UserPageComponent({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

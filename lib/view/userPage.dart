@@ -5,7 +5,7 @@ import '../component/userPage.dart';
 
 class UserPage extends StatefulWidget {
   final String username;
-  const UserPage({Key key, this.username}) : super(key: key);
+  const UserPage({Key? key, required this.username}) : super(key: key);
 
   @override
   _UserPageState createState() => _UserPageState();
@@ -26,7 +26,7 @@ class _UserPageState extends State<UserPage> {
   Widget _buildDetailUserBody() {
     return Container(
       child: FutureBuilder(
-        future:  UserDataSource.instance.loadUser(widget.username),
+        future:  DataSource.instance.loadUser(widget.username),
         builder: (BuildContext context,
             AsyncSnapshot<dynamic> snapshot,) {
 

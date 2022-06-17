@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import '../model/repoModel.dart';
+import '../model/followersModel.dart';
 import '../controller/req.dart';
 import '../component/userPage.dart';
 
-class RepoPage extends StatefulWidget {
+class FollowersPage extends StatefulWidget {
   final String username;
-  const RepoPage({Key key,  this.username}) : super(key: key);
+  const FollowersPage({Key key,  this.username}) : super(key: key);
 
   @override
-  _RepoPageState createState() => _RepoPageState();
+  _FollowersPageState createState() => _FollowersPageState();
 }
 
-class _RepoPageState extends State<RepoPage> {
+class _FollowersPageState extends State<FollowersPage> {
 
   @override
   Widget build(BuildContext context) {
@@ -24,8 +24,8 @@ class _RepoPageState extends State<RepoPage> {
   }
 
   Widget _buildDetailRepoBody() {
-    return FutureBuilder<List<RepoModel>>(
-        future: DataSource.instance.loadUsersRepo(widget.username),
+    return FutureBuilder<List<FollowersModel>>(
+        future: DataSource.instance.loadUsersFollowers(widget.username),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return _buildErrorSection();
@@ -38,8 +38,13 @@ class _RepoPageState extends State<RepoPage> {
         });
   }
 
+
   Widget _buildErrorSection() {
     return Text("Error");
+  }
+
+  Widget _buildEmptySection() {
+    return Text("Empty");
   }
 
   Widget _buildLoadingSection() {
@@ -48,13 +53,13 @@ class _RepoPageState extends State<RepoPage> {
     );
   }
 
-  Widget _buildSuccessSection(AsyncSnapshot<List<RepoModel>> snapshot) {
+  Widget _buildSuccessSection(AsyncSnapshot<List<FollowersModel>> snapshot) {
     return ListView.builder(
       itemCount: snapshot.data.length,
       itemBuilder: (BuildContext context, int index) {
         return Card(
           child: ListTile(
-              title: _repoPage("${snapshot.data[index].name}")
+              title: _repoPage("${snapshot.data[index].login}")
           ),
           color: Colors.white70,
         );
